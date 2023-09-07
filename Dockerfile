@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux GIN_MODE=release go build -ldflags="-w
 # STEP 2 build a small image
 ############################
 
-FROM scratch AS seseiveReader
+FROM alpine AS seseiveReader
 # Copy our static executable.
 COPY --from=builder /go/bin/senseiveReader /go/bin/app
 RUN mkdir "backup"
