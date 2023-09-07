@@ -1,8 +1,9 @@
 package reader
 
 import (
-	"3sigmas-monitorVisualization/pkg/reader/data"
-	"fmt"
+	"3sigmas-monitorVisualization/pkg/data"
+	"github.com/getsentry/sentry-go"
+	"log"
 	"strconv"
 	"time"
 )
@@ -13,19 +14,19 @@ func SenseiveParse(records [][]string) []data.Measure {
 
 		d, err := time.Parse("2006-01-02 15:04:05", record[0])
 		if err != nil {
-			panic(err)
+			sentry.CaptureException(err)
 		}
 
 		v, err := strconv.ParseFloat(record[4], 64)
 		if err != nil {
-			panic(err)
+			sentry.CaptureException(err)
 		}
 
 		t := 0.0
 		if len(record) > 5 {
 			t, err = strconv.ParseFloat(record[5], 64)
 			if err != nil {
-				panic(err)
+				sentry.CaptureException(err)
 			}
 		}
 
@@ -36,8 +37,8 @@ func SenseiveParse(records [][]string) []data.Measure {
 			Captor:      record[1],
 			Sensor:      record[2],
 		}
-		fmt.Println("Created measure: ", m)
 		measures = append(measures, m)
 	}
+	log.Printf("Parsed %d measures\n", len(measures))
 	return measures
 }

@@ -2,52 +2,56 @@ package listener
 
 import (
 	"3sigmas-monitorVisualization/pkg"
-	"fmt"
+	"3sigmas-monitorVisualization/pkg/data"
+	"github.com/getsentry/sentry-go"
 	"github.com/secsy/goftp"
+	"log"
 	"os"
 	"strings"
 	"time"
 )
 
 type FtpListener struct {
-	client *goftp.Client
+	client     *goftp.Client
+	localPath  string
+	serverPath string
 }
 
-func NewFtpListener() *FtpListener {
+func NewFtpListener(env data.Env) *FtpListener {
 	config := goftp.Config{
-		User:     pkg.FtpUser,
-		Password: pkg.FtpPassword,
+		User:     env.FtpUser,
+		Password: env.FtpPassword,
 	}
-	client, err := goftp.DialConfig(config, pkg.FtpServerUrl)
+	client, err := goftp.DialConfig(config, env.FtpServer)
 	if err != nil {
-		panic(err)
+		sentry.CaptureException(err)
 	}
 	return &FtpListener{
-		client: client,
+		client:     client,
+		localPath:  env.FtpLocalPath,
+		serverPath: env.FtpServerPath,
 	}
 }
 
 func (f *FtpListener) Listen() (string, string) {
+	log.Printf("Listening for new files... ")
 	todo, filename := f.nextFile()
 	for todo, filename = f.nextFile(); !todo; {
 		if !todo {
-			fmt.Println("No file to read")
-			time.Sleep(5 * time.Second)
+			time.Sleep(pkg.WaitTime)
 		}
 	}
-	fmt.Println("Reading file: ", filename)
+	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
-	fmt.Println("File downloaded")
 	f.deleteFile(filename)
-	fmt.Println("File deleted")
-	return f.extractProject(filename), pkg.FtpLocalPath + "/" + filename
+	return f.extractProject(filename), f.localPath + "/" + filename
 
 }
 
 func (f *FtpListener) nextFile() (bool, string) {
-	files, err := f.client.ReadDir(pkg.FtpServerPath)
+	files, err := f.client.ReadDir(f.serverPath)
 	if err != nil {
-		panic(err)
+		sentry.CaptureException(err)
 	}
 	if len(files) == 0 {
 		return false, ""
@@ -56,20 +60,20 @@ func (f *FtpListener) nextFile() (bool, string) {
 }
 
 func (f *FtpListener) downloadFile(filename string) {
-	localFile, err := os.Create(pkg.FtpLocalPath + "/" + filename)
+	localFile, err := os.Create(f.localPath + "/" + filename)
 	if err != nil {
-		panic(err)
+		sentry.CaptureException(err)
 	}
-	err = f.client.Retrieve(pkg.FtpServerPath+"/"+filename, localFile)
+	err = f.client.Retrieve(f.serverPath+"/"+filename, localFile)
 	if err != nil {
-		panic(err)
+		sentry.CaptureException(err)
 	}
 }
 
 func (f *FtpListener) deleteFile(filename string) {
-	err := f.client.Delete(pkg.FtpServerPath + "/" + filename)
+	err := f.client.Delete(f.serverPath + "/" + filename)
 	if err != nil {
-		panic(err)
+		sentry.CaptureException(err)
 	}
 }
 

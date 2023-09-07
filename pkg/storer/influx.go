@@ -1,10 +1,9 @@
 package storer
 
 import (
-	"3sigmas-monitorVisualization/pkg"
-	"3sigmas-monitorVisualization/pkg/reader/data"
+	"3sigmas-monitorVisualization/pkg/data"
 	"context"
-	"fmt"
+	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -18,11 +17,11 @@ type InfluxStorer struct {
 	bucketApi    api.BucketsAPI
 }
 
-func NewInfluxStorer() *InfluxStorer {
-	client := influxdb2.NewClient(pkg.Url, pkg.TOKEN)
-	org, err := client.OrganizationsAPI().FindOrganizationByName(context.Background(), pkg.OrganizationName)
+func NewInfluxStorer(env data.Env) *InfluxStorer {
+	client := influxdb2.NewClient(env.InfluxUrl, env.InfluxToken)
+	org, err := client.OrganizationsAPI().FindOrganizationByName(context.Background(), env.InfluxOrg)
 	if err != nil {
-		log.Fatal(err)
+		sentry.CaptureException(err)
 	}
 	return &InfluxStorer{
 		client:       client,
@@ -35,9 +34,10 @@ func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 	bucketApi := s.client.BucketsAPI()
 	bucket, err := bucketApi.FindBucketByName(context.Background(), bucketName)
 	if bucket == nil {
+		log.Printf("Bucket %s not found, creating it\n", bucketName)
 		bucket, err = bucketApi.CreateBucketWithName(context.Background(), s.organization, bucketName)
 		if err != nil {
-			panic(err)
+			sentry.CaptureException(err)
 		}
 	}
 	return bucket
@@ -58,9 +58,9 @@ func (s *InfluxStorer) Store(project string, measures []data.Measure) {
 			"temperature": measure.Temperature,
 		}
 		point := write.NewPoint(measure.Captor, tags, fields, measure.Date)
-		fmt.Println("Writing point: ", measure)
 		if err := writeAPI.WritePoint(context.Background(), point); err != nil {
-			panic(err)
+			sentry.CaptureException(err)
 		}
 	}
+	log.Printf("Stored %d measures in %s\n", len(measures), project)
 }
