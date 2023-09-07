@@ -1,0 +1,43 @@
+name: Create and publish a Docker image
+
+on:
+  - push
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_SENSEIVE_NAME: ${{ github.repository }}/senseive-reader
+  IMAGE_SENSEIVE_VERSION: 0.1.0
+
+jobs:
+  build-and-push-senseive-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ env.IMAGE_SENSEIVE_VERSION }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_SENSEIVE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_SENSEIVE_VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
