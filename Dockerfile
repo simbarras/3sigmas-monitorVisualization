@@ -17,5 +17,5 @@ RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux GIN_MODE=release go build -ldflags="-w
 FROM alpine AS seseiveReader
 # Copy our static executable.
 COPY --from=builder /go/bin/senseiveReader /go/bin/app
-RUN mkdir "backup"
+RUN mkdir "/backup"
 ENTRYPOINT ["/go/bin/app"]

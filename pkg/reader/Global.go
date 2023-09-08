@@ -20,6 +20,7 @@ func Read(filepath string) [][]string {
 	file, err := os.Open(filepath)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	defer closeFile(file)
 
@@ -27,6 +28,7 @@ func Read(filepath string) [][]string {
 	records, err := reader.ReadAll()
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	log.Printf("Read %d lines from %s\n", len(records), filepath)
 	return records

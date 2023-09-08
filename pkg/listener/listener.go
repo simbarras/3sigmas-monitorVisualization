@@ -25,6 +25,7 @@ func NewFtpListener(env data.Env) *FtpListener {
 	client, err := goftp.DialConfig(config, env.FtpServer)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	return &FtpListener{
 		client:     client,
@@ -39,6 +40,7 @@ func (f *FtpListener) Listen() (string, string) {
 	for todo, filename = f.nextFile(); !todo; {
 		if !todo {
 			time.Sleep(pkg.WaitTime)
+			log.Printf("No file found, waiting %s\n", pkg.WaitTime)
 		}
 	}
 	log.Printf("File %s found\n", filename)
@@ -52,6 +54,7 @@ func (f *FtpListener) nextFile() (bool, string) {
 	files, err := f.client.ReadDir(f.serverPath)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	if len(files) == 0 {
 		return false, ""
@@ -63,10 +66,12 @@ func (f *FtpListener) downloadFile(filename string) {
 	localFile, err := os.Create(f.localPath + "/" + filename)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	err = f.client.Retrieve(f.serverPath+"/"+filename, localFile)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 }
 
@@ -74,6 +79,7 @@ func (f *FtpListener) deleteFile(filename string) {
 	err := f.client.Delete(f.serverPath + "/" + filename)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 }
 

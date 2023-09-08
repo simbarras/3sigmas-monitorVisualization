@@ -22,6 +22,7 @@ func NewInfluxStorer(env data.Env) *InfluxStorer {
 	org, err := client.OrganizationsAPI().FindOrganizationByName(context.Background(), env.InfluxOrg)
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 	return &InfluxStorer{
 		client:       client,
@@ -38,6 +39,7 @@ func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 		bucket, err = bucketApi.CreateBucketWithName(context.Background(), s.organization, bucketName)
 		if err != nil {
 			sentry.CaptureException(err)
+			panic(err)
 		}
 	}
 	return bucket
@@ -60,6 +62,7 @@ func (s *InfluxStorer) Store(project string, measures []data.Measure) {
 		point := write.NewPoint(measure.Captor, tags, fields, measure.Date)
 		if err := writeAPI.WritePoint(context.Background(), point); err != nil {
 			sentry.CaptureException(err)
+			panic(err)
 		}
 	}
 	log.Printf("Stored %d measures in %s\n", len(measures), project)
