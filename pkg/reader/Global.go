@@ -11,6 +11,7 @@ func closeFile(file *os.File) {
 	err := file.Close()
 	if err != nil {
 		sentry.CaptureException(err)
+		panic(err)
 	}
 }
 

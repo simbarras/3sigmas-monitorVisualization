@@ -13,7 +13,6 @@ import (
 
 type FtpListener struct {
 	client     *goftp.Client
-	localPath  string
 	serverPath string
 }
 
@@ -29,7 +28,6 @@ func NewFtpListener(env data.Env) *FtpListener {
 	}
 	return &FtpListener{
 		client:     client,
-		localPath:  env.FtpLocalPath,
 		serverPath: env.FtpServerPath,
 	}
 }
@@ -40,13 +38,12 @@ func (f *FtpListener) Listen() (string, string) {
 	for todo, filename = f.nextFile(); !todo; {
 		if !todo {
 			time.Sleep(pkg.WaitTime)
-			log.Printf("No file found, waiting %s\n", pkg.WaitTime)
 		}
 	}
 	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
 	f.deleteFile(filename)
-	return f.extractProject(filename), f.localPath + "/" + filename
+	return f.extractProject(filename), pkg.FtpLocalPath + "/" + filename
 
 }
 
@@ -56,6 +53,7 @@ func (f *FtpListener) nextFile() (bool, string) {
 		sentry.CaptureException(err)
 		panic(err)
 	}
+	log.Printf("Found %d file(s)\n", len(files))
 	if len(files) == 0 {
 		return false, ""
 	}
@@ -63,7 +61,7 @@ func (f *FtpListener) nextFile() (bool, string) {
 }
 
 func (f *FtpListener) downloadFile(filename string) {
-	localFile, err := os.Create(f.localPath + "/" + filename)
+	localFile, err := os.Create(pkg.FtpLocalPath + "/" + filename)
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)
@@ -85,7 +83,7 @@ func (f *FtpListener) deleteFile(filename string) {
 
 // Sample:  Geosud-Demo_rail_2023-09-06_14-05-53.csv
 // project name: Geosud-Demo_rail
-// split ath _20
+// split at _20
 func (f *FtpListener) extractProject(filename string) string {
 	return strings.Split(filename, "_20")[0]
 }

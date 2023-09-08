@@ -10,7 +10,6 @@ type Env struct {
 	FtpServerPath string
 	FtpUser       string
 	FtpPassword   string
-	FtpLocalPath  string
 }
 
 func (e *Env) String() string {
@@ -20,8 +19,7 @@ func (e *Env) String() string {
 		"FtpServer: " + e.FtpServer + "\n" +
 		"FtpServerPath: " + e.FtpServerPath + "\n" +
 		"FtpUser: " + e.FtpUser + "\n" +
-		"FtpPassword: " + e.FtpPassword + "\n" +
-		"FtpLocalPath: " + e.FtpLocalPath + "\n"
+		"FtpPassword: " + e.FtpPassword + "\n"
 }
 
 func ReadEnv() Env {
@@ -33,7 +31,6 @@ func ReadEnv() Env {
 		FtpServerPath: os.Getenv("FTP_SERVER_PATH"),
 		FtpUser:       os.Getenv("FTP_USER"),
 		FtpPassword:   os.Getenv("FTP_PASSWORD"),
-		FtpLocalPath:  os.Getenv("FTP_LOCAL_PATH"),
 	}
 	return env
 }
