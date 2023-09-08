@@ -33,6 +33,6 @@ func main() {
 	for {
 		project, filepath := ftpListener.Listen()
 		log.Printf("Process file %s from %s\n", filepath, project)
-		go influxStorer.Store(project, reader.SenseiveParse(reader.Read(filepath)))
+		go influxStorer.Store(project, reader.SenseiveParse(reader.ReadAndDelete(filepath)))
 	}
 }

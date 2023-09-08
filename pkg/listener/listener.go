@@ -54,15 +54,24 @@ func (f *FtpListener) nextFile() (bool, string) {
 		sentry.CaptureException(err)
 		panic(err)
 	}
-	log.Printf("Found %d file(s)\n", len(files))
 	if len(files) == 0 {
 		return false, ""
 	}
+	log.Printf("Found %d file(s)\n", len(files))
 	return true, files[0].Name()
+}
+
+func closeFile(file *os.File) {
+	err := file.Close()
+	if err != nil {
+		sentry.CaptureException(err)
+		panic(err)
+	}
 }
 
 func (f *FtpListener) downloadFile(filename string) {
 	localFile, err := os.Create(pkg.FtpLocalPath + "/" + filename)
+	defer closeFile(localFile)
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)

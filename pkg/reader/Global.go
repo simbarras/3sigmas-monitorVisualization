@@ -7,23 +7,28 @@ import (
 	"os"
 )
 
-func closeFile(file *os.File) {
+func closeAndDelete(file *os.File) {
 	err := file.Close()
+	if err != nil {
+		sentry.CaptureException(err)
+		panic(err)
+	}
+	err = os.Remove(file.Name())
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)
 	}
 }
 
-func Read(filepath string) [][]string {
+func ReadAndDelete(filepath string) [][]string {
 
-	// Read csv from filepath
+	// ReadAndDelete csv from filepath
 	file, err := os.Open(filepath)
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)
 	}
-	defer closeFile(file)
+	defer closeAndDelete(file)
 
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
