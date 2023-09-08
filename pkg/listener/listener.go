@@ -35,10 +35,11 @@ func NewFtpListener(env data.Env) *FtpListener {
 func (f *FtpListener) Listen() (string, string) {
 	log.Printf("Listening for new files... ")
 	todo, filename := f.nextFile()
-	for todo, filename = f.nextFile(); !todo; {
+	for !todo {
 		if !todo {
 			time.Sleep(pkg.WaitTime)
 		}
+		todo, filename = f.nextFile()
 	}
 	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
