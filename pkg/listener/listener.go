@@ -50,6 +50,10 @@ func (f *FtpListener) Listen() (string, string) {
 
 func (f *FtpListener) nextFile() (bool, string) {
 	files, err := f.client.ReadDir(f.serverPath)
+	// Filter to keep only csv files
+	files = pkg.Filter(files, func(file os.FileInfo) bool {
+		return strings.HasSuffix(file.Name(), ".csv")
+	})
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)

@@ -1,6 +1,7 @@
 package storer
 
 import (
+	"3sigmas-monitorVisualization/pkg"
 	"3sigmas-monitorVisualization/pkg/data"
 	"context"
 	"github.com/getsentry/sentry-go"
@@ -15,6 +16,7 @@ type InfluxStorer struct {
 	client       influxdb2.Client
 	organization *domain.Organization
 	bucketApi    api.BucketsAPI
+	bucketSuffix string
 }
 
 func NewInfluxStorer(env data.Env) *InfluxStorer {
@@ -28,6 +30,7 @@ func NewInfluxStorer(env data.Env) *InfluxStorer {
 		client:       client,
 		organization: org,
 		bucketApi:    client.BucketsAPI(),
+		bucketSuffix: env.InfluxSuffix,
 	}
 }
 
@@ -47,7 +50,7 @@ func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 
 func (s *InfluxStorer) Store(project string, measures []data.Measure) {
 
-	bucket := s.setBucket(project)
+	bucket := s.setBucket(project + pkg.SenseiveSource + s.bucketSuffix)
 
 	writeAPI := s.client.WriteAPIBlocking(s.organization.Name, bucket.Name)
 
@@ -64,6 +67,7 @@ func (s *InfluxStorer) Store(project string, measures []data.Measure) {
 			sentry.CaptureException(err)
 			panic(err)
 		}
+		// log.Printf("Stored measure %s\n", measure)
 	}
-	log.Printf("Stored %d measures in %s\n", len(measures), project)
+	log.Printf("Stored %d measures in %s\n", len(measures), bucket.Name)
 }

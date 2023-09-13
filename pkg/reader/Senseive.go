@@ -32,7 +32,6 @@ func SenseiveParse(records [][]string) []data.Measure {
 				panic(err)
 			}
 		}
-
 		m := data.Measure{
 			Date:        d,
 			Value:       v,
