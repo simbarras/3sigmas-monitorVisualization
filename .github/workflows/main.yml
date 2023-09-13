@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_SENSEIVE_NAME: ${{ github.repository }}/senseive-reader
   IMAGE_TRIMBLE_NAME: ${{ github.repository }}/trimble-reader
-  IMAGE_VERSION: 0.2.1
+  IMAGE_VERSION: 0.2.2
 
 jobs:
   senseive-build-and-push-image:
@@ -60,7 +60,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_SENSEIVE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_TRIMBLE_NAME }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.1.1
         with:
