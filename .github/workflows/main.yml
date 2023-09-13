@@ -6,7 +6,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_SENSEIVE_NAME: ${{ github.repository }}/senseive-reader
-  IMAGE_SENSEIVE_VERSION: 0.1.3
+  IMAGE_SENSEIVE_VERSION: 0.2.0
 
 jobs:
   build-and-push-senseive-image:

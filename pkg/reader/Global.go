@@ -1,11 +1,18 @@
 package reader
 
 import (
+	"3sigmas-monitorVisualization/pkg/data"
 	"encoding/csv"
 	"github.com/getsentry/sentry-go"
 	"log"
 	"os"
 )
+
+type Parser interface {
+	Parse(records [][]string) ([]data.Measure, error)
+	ExtractProject(filename string) string
+	Source() string
+}
 
 func closeAndDelete(file *os.File) {
 	err := file.Close()

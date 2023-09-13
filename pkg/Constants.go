@@ -1,23 +1,11 @@
 package pkg
 
 import (
-	"os"
 	"time"
 )
 
 const (
-	Version        = "0.1.3"
-	WaitTime       = 5 * time.Second
-	FtpLocalPath   = "."
-	SenseiveSource = "-senseive"
+	Version      = "0.2.0"
+	WaitTime     = 5 * time.Second
+	FtpLocalPath = "."
 )
-
-func Filter(files []os.FileInfo, filter func(os.FileInfo) bool) []os.FileInfo {
-	var filtered []os.FileInfo
-	for _, file := range files {
-		if filter(file) {
-			filtered = append(filtered, file)
-		}
-	}
-	return filtered
-}

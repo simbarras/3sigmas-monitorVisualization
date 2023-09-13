@@ -6,7 +6,7 @@ type Env struct {
 	InfluxToken   string
 	InfluxUrl     string
 	InfluxOrg     string
-	InfluxSuffix  string
+	InfluxPrefix  string
 	FtpServer     string
 	FtpServerPath string
 	FtpUser       string
@@ -17,7 +17,7 @@ func (e *Env) String() string {
 	return "InfluxToken: " + e.InfluxToken + "\n" +
 		"InfluxUrl: " + e.InfluxUrl + "\n" +
 		"InfluxOrg: " + e.InfluxOrg + "\n" +
-		"InfluxSuffix: " + e.InfluxSuffix + "\n" +
+		"InfluxPrefix: " + e.InfluxPrefix + "\n" +
 		"FtpServer: " + e.FtpServer + "\n" +
 		"FtpServerPath: " + e.FtpServerPath + "\n" +
 		"FtpUser: " + e.FtpUser + "\n" +
@@ -29,7 +29,7 @@ func ReadEnv() Env {
 		InfluxToken:   os.Getenv("INFLUX_TOKEN"),
 		InfluxUrl:     os.Getenv("INFLUX_URL"),
 		InfluxOrg:     os.Getenv("INFLUX_ORG"),
-		InfluxSuffix:  os.Getenv("INFLUX_SUFFIX"),
+		InfluxPrefix:  os.Getenv("INFLUX_PREFIX"),
 		FtpServer:     os.Getenv("FTP_SERVER_URL"),
 		FtpServerPath: os.Getenv("FTP_SERVER_PATH"),
 		FtpUser:       os.Getenv("FTP_USER"),

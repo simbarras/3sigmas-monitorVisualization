@@ -38,7 +38,7 @@ func NewFtpListener(env data.Env, maxIndex int) *FtpListener {
 	}
 }
 
-func (f *FtpListener) Listen() (string, string) {
+func (f *FtpListener) Listen() string {
 	log.Printf("Listening for new files... ")
 	todo, filename := f.nextFile()
 	for !todo {
@@ -49,14 +49,14 @@ func (f *FtpListener) Listen() (string, string) {
 	}
 	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
-	return f.extractProject(filename), filename
+	return filename
 
 }
 
 func (f *FtpListener) nextFile() (bool, string) {
 	files, err := f.client.ReadDir(f.serverPath)
 	// Filter to keep only csv files
-	files = pkg.Filter(files, func(file os.FileInfo) bool {
+	files = filter(files, func(file os.FileInfo) bool {
 		if !strings.HasSuffix(file.Name(), ".csv") {
 			return false
 		}
@@ -119,9 +119,12 @@ func (f *FtpListener) RegisterBlacklist(filename string) {
 	log.Printf("File %s registered in blacklist at index %d with size %d and max size %d\n", filename, f.index, f.size, len(f.blacklist))
 }
 
-// Sample:  Geosud-Demo_rail_2023-09-06_14-05-53.csv
-// project name: Geosud-Demo_rail
-// split at _20
-func (f *FtpListener) extractProject(filename string) string {
-	return strings.Split(filename, "_20")[0]
+func filter(files []os.FileInfo, filter func(os.FileInfo) bool) []os.FileInfo {
+	var filtered []os.FileInfo
+	for _, file := range files {
+		if filter(file) {
+			filtered = append(filtered, file)
+		}
+	}
+	return filtered
 }
