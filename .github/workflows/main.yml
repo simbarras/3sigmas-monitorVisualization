@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_SENSEIVE_NAME: ${{ github.repository }}/senseive-reader
   IMAGE_TRIMBLE_NAME: ${{ github.repository }}/trimble-reader
-  IMAGE_VERSION: 0.2.0
+  IMAGE_VERSION: 0.2.1
 
 jobs:
   senseive-build-and-push-image:
@@ -37,7 +37,7 @@ jobs:
           file: ./Dockerfile
           target: senseiveReader
           push: true
-          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_SENSEIVE_VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
 
@@ -68,5 +68,5 @@ jobs:
           file: ./Dockerfile
           target: trimbleReader
           push: true
-          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_SENSEIVE_VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
