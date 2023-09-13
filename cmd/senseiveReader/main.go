@@ -28,11 +28,18 @@ func main() {
 	log.Printf("Launching with env: \n%+v\n", env)
 
 	influxStorer := storer.NewInfluxStorer(env)
-	ftpListener := listener.NewFtpListener(env)
+	ftpListener := listener.NewFtpListener(env, 255)
 
 	for {
 		project, filepath := ftpListener.Listen()
 		log.Printf("Process file %s from %s\n", filepath, project)
-		go influxStorer.Store(project, reader.SenseiveParse(reader.ReadAndDelete(filepath)))
+		measures, accepted := reader.SenseiveParse(reader.ReadAndDelete(pkg.FtpLocalPath + "/" + filepath))
+		if !accepted {
+			log.Printf("File %s rejected\n", pkg.FtpLocalPath+"/"+filepath)
+			ftpListener.RegisterBlacklist(filepath)
+			continue
+		}
+		ftpListener.DeleteFile(filepath)
+		go influxStorer.Store(project, measures)
 	}
 }

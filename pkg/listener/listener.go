@@ -14,9 +14,12 @@ import (
 type FtpListener struct {
 	client     *goftp.Client
 	serverPath string
+	blacklist  []string
+	index      int
+	size       int
 }
 
-func NewFtpListener(env data.Env) *FtpListener {
+func NewFtpListener(env data.Env, maxIndex int) *FtpListener {
 	config := goftp.Config{
 		User:     env.FtpUser,
 		Password: env.FtpPassword,
@@ -29,6 +32,9 @@ func NewFtpListener(env data.Env) *FtpListener {
 	return &FtpListener{
 		client:     client,
 		serverPath: env.FtpServerPath,
+		blacklist:  make([]string, maxIndex),
+		index:      -1,
+		size:       0,
 	}
 }
 
@@ -43,8 +49,7 @@ func (f *FtpListener) Listen() (string, string) {
 	}
 	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
-	f.deleteFile(filename)
-	return f.extractProject(filename), pkg.FtpLocalPath + "/" + filename
+	return f.extractProject(filename), filename
 
 }
 
@@ -52,7 +57,15 @@ func (f *FtpListener) nextFile() (bool, string) {
 	files, err := f.client.ReadDir(f.serverPath)
 	// Filter to keep only csv files
 	files = pkg.Filter(files, func(file os.FileInfo) bool {
-		return strings.HasSuffix(file.Name(), ".csv")
+		if !strings.HasSuffix(file.Name(), ".csv") {
+			return false
+		}
+		for _, filename := range f.blacklist {
+			if filename == file.Name() {
+				return false
+			}
+		}
+		return true
 	})
 	if err != nil {
 		sentry.CaptureException(err)
@@ -87,12 +100,23 @@ func (f *FtpListener) downloadFile(filename string) {
 	}
 }
 
-func (f *FtpListener) deleteFile(filename string) {
+func (f *FtpListener) DeleteFile(filename string) {
 	err := f.client.Delete(f.serverPath + "/" + filename)
 	if err != nil {
 		sentry.CaptureException(err)
 		panic(err)
 	}
+	log.Printf("File %s deleted on FTP\n", filename)
+}
+
+func (f *FtpListener) RegisterBlacklist(filename string) {
+	f.index = (f.index + 1) % len(f.blacklist)
+	f.blacklist[f.index] = filename
+	f.size++
+	if f.size > len(f.blacklist) {
+		f.size = len(f.blacklist)
+	}
+	log.Printf("File %s registered in blacklist at index %d with size %d and max size %d\n", filename, f.index, f.size, len(f.blacklist))
 }
 
 // Sample:  Geosud-Demo_rail_2023-09-06_14-05-53.csv
