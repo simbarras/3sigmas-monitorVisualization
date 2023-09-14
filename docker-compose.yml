@@ -1,19 +1,18 @@
-version: "3"
-
-networks:
-  monitoring:
-
+version: '3'
 services:
-  influxdb:
-    image: influxdb:2.7
-    ports:
-      - 8086:8086
-    networks:
-      - monitoring
+  senseive-reader:
+    image: ghcr.io/simbarras/3sigmas-monitorvisualization/senseive-reader:main-0.0.5
+    restart: always
+    environment:
+      - INFLUX_TOKEN=-LSlQXq0uRiNrRuO5gtRg8g75aCU8_9S7ez2tGnfVjQBBaUkby_mXkpQSI9qqoxY0KF1EfGfnevwR6Uo4zG35g==
+      - INFLUX_URL=http://192.168.1.158:8086
+      - INFLUX_ORG=3sigmas
+      - FTP_SERVER_URL=ftp.cluster020.hosting.ovh.net
+      - FTP_SERVER_PATH=/grafana
+      - FTP_USER=sigmaschcy-guest
+      - FTP_PASSWORD=GUEST3sigmas
+    volumes:
+      - senseive_data:/backup
 
-  grafana:
-    image: grafana/grafana:10.1.1
-    ports:
-      - 3000:3000
-    networks:
-      - monitoring
+volumes:
+  senseive_data: {}

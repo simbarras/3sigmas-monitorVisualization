@@ -2,6 +2,7 @@ package reader
 
 import (
 	"3sigmas-monitorVisualization/pkg/data"
+	"errors"
 	"log"
 	"strconv"
 	"strings"
@@ -41,6 +42,9 @@ func (s *SenseiveParser) Parse(records [][]string) ([]data.Measure, error) {
 		measures = append(measures, m)
 	}
 	log.Printf("Parsed %d measures\n", len(measures))
+	if len(measures) == 0 {
+		return nil, errors.New("no measures")
+	}
 	return measures, nil
 }
 
