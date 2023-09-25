@@ -2,9 +2,8 @@ package process
 
 import (
 	"3sigmas-monitorVisualization/pkg"
-	"3sigmas-monitorVisualization/pkg/listener"
+	"3sigmas-monitorVisualization/pkg/data"
 	"3sigmas-monitorVisualization/pkg/reader"
-	"3sigmas-monitorVisualization/pkg/storer"
 	"github.com/getsentry/sentry-go"
 	"log"
 )
@@ -23,17 +22,13 @@ func SetSentry() {
 	}
 }
 
-func Process(ftpListener *listener.FtpListener, influxStorer *storer.InfluxStorer, parser reader.Parser) {
-	for {
-		filepath := ftpListener.Listen()
-		log.Printf("Process file %s\n", filepath)
-		measures, err := parser.Parse(reader.ReadAndDelete(pkg.FtpLocalPath + "/" + filepath))
-		if err != nil {
-			log.Printf("File %s rejected due to error: %s\n", pkg.FtpLocalPath+"/"+filepath, err)
-			ftpListener.RegisterBlacklist(filepath)
-			continue
+func FindParser(records [][]string, parsers []reader.Parser) (reader.Parser, []data.Measure) {
+	for _, parser := range parsers {
+		measures, err := parser.Parse(records)
+		if err == nil {
+			return parser, measures
 		}
-		ftpListener.DeleteFile(filepath)
-		go influxStorer.Store(parser.ExtractProject(filepath), parser.Source(), measures)
+		log.Printf("Parser %s rejected due to error: %s\n", parser.Source(), err)
 	}
+	return nil, nil
 }

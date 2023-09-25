@@ -36,16 +36,16 @@ func NewInfluxStorer(env data.Env) *InfluxStorer {
 }
 
 func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	bucketApi := s.client.BucketsAPI()
 	bucket, err := bucketApi.FindBucketByName(context.Background(), bucketName)
 	if bucket == nil {
 		log.Printf("Bucket %s not found, creating it\n", bucketName)
-		s.mu.Lock()
 		bucket, err = bucketApi.CreateBucketWithName(context.Background(), s.organization, bucketName)
 		if err != nil {
 			sentry.CaptureException(err)
 		}
-		s.mu.Unlock()
 	}
 	return bucket
 }

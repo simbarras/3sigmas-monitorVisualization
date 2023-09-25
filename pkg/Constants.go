@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	Version      = "0.2.3"
+	Version      = "0.3.0"
 	WaitTime     = 5 * time.Second
 	FtpLocalPath = "."
 )
