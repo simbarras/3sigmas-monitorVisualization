@@ -5,12 +5,11 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_SENSEIVE_NAME: ${{ github.repository }}/senseive-reader
-  IMAGE_TRIMBLE_NAME: ${{ github.repository }}/trimble-reader
+  IMAGE_NAME: ${{ github.repository }}/data-reader
   IMAGE_VERSION: 0.3.0
 
 jobs:
-  senseive-build-and-push-image:
+ build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,44 +28,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4.6.0
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_SENSEIVE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.1.1
         with:
           context: .
           file: ./Dockerfile
-          target: senseiveReader
+          target: dataReader
           push: true
           tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
-
-  trimble-build-and-push-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2.2.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          version: ${{ env.IMAGE_VERSION }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4.6.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_TRIMBLE_NAME }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4.1.1
-        with:
-          context: .
-          file: ./Dockerfile
-          target: trimbleReader
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}-${{ env.IMAGE_VERSION }}
-          labels: ${{ steps.meta.outputs.labels }}
