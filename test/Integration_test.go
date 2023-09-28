@@ -10,7 +10,7 @@ import (
 )
 
 func listFiles() ([]os.DirEntry, error) {
-	files, err := os.ReadDir("../../resources")
+	files, err := os.ReadDir("../resources")
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -21,15 +21,15 @@ func listFiles() ([]os.DirEntry, error) {
 }
 
 func copyFile(filename string) error {
-	if _, err := os.Stat("../../backup"); os.IsNotExist(err) {
-		err := os.Mkdir("../../backup", 0755)
+	if _, err := os.Stat("../backup"); os.IsNotExist(err) {
+		err := os.Mkdir("../backup", 0755)
 		if err != nil {
 			log.Fatal(err)
 			return err
 		}
 	}
 
-	sourceFile, err := os.Open("../../resources/" + filename)
+	sourceFile, err := os.Open("../resources/" + filename)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -43,7 +43,7 @@ func copyFile(filename string) error {
 		}
 	}(sourceFile)
 
-	destFile, err := os.Create("../../backup/" + filename)
+	destFile, err := os.Create("../backup/" + filename)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -84,7 +84,7 @@ func TestIntegration(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		parser, measures := process.FindParser(reader.ReadAndDelete("../../backup/"+file.Name()), parsers)
+		parser, measures := process.FindParser(reader.ReadAndDelete("../backup/"+file.Name()), parsers)
 		if parser == nil {
 			if file.Name() != "Geosud-Demo_rail_2023-09-07_10-06-25-copy.csv" {
 				t.Errorf("No parser found for file %s\n", file.Name())
