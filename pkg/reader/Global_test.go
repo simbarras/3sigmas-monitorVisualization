@@ -9,8 +9,8 @@ import (
 
 func copyFile(filename string) error {
 	// Create backup folder if it does not exist
-	if _, err := os.Stat("./backup"); os.IsNotExist(err) {
-		err := os.Mkdir("./backup", 0755)
+	if _, err := os.Stat("../../backup"); os.IsNotExist(err) {
+		err := os.Mkdir("../../backup", 0755)
 		if err != nil {
 			log.Fatal(err)
 			return err
@@ -24,6 +24,7 @@ func copyFile(filename string) error {
 		return err
 	}
 	log.Printf("Found %d file(s)\n", len(files))
+	log.Printf("Files: %v\n", files)
 
 	sourceFile, err := os.Open("../../resources/" + filename)
 	if err != nil {
