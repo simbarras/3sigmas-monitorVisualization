@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-func TestSetSentry(t *testing.T) {
-	SetSentry()
-}
-
 func TestFindParser(t *testing.T) {
 	parsers := make([]reader.Parser, 0)
 	parsers = append(parsers, &reader.SenseiveParser{})
