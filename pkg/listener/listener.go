@@ -119,8 +119,8 @@ func (f *FtpListener) RegisterBlacklist(filename string) {
 	log.Printf("File %s registered in blacklist at index %d with size %d and max size %d\n", filename, f.index, f.size, len(f.blacklist))
 }
 
-func filter(files []os.FileInfo, filter func(os.FileInfo) bool) []os.FileInfo {
-	var filtered []os.FileInfo
+func filter[K comparable](files []K, filter func(K) bool) []K {
+	var filtered []K
 	for _, file := range files {
 		if filter(file) {
 			filtered = append(filtered, file)
