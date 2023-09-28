@@ -19,6 +19,9 @@ func (t *TrimbleParser) Parse(records [][]string) ([]data.Measure, error) {
 			head = false
 			continue
 		}
+		if len(record) != 11 {
+			return nil, errors.New("invalid record length")
+		}
 		d, err := time.Parse("2006-01-02 15:04:05", record[0])
 		if err != nil {
 			return nil, err

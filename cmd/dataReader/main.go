@@ -7,11 +7,22 @@ import (
 	"3sigmas-monitorVisualization/pkg/process"
 	"3sigmas-monitorVisualization/pkg/reader"
 	"3sigmas-monitorVisualization/pkg/storer"
+	"github.com/getsentry/sentry-go"
 	"log"
 )
 
 func main() {
-	process.SetSentry()
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: "https://ff671ea4c1f2ace1811282b96669e095@o4505048574001152.ingest.sentry.io/4505841145675776",
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+		Release:          pkg.Version,
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
 
 	log.Printf("App started in release %s\n", pkg.Version)
 
@@ -25,7 +36,11 @@ func main() {
 	parsers = append(parsers, &reader.TrimbleParser{})
 
 	for {
-		filepath := ftpListener.Listen()
+		filepath, err := ftpListener.Listen()
+		if err != nil {
+			log.Printf("Error listening for new files: %s\n", err.Error())
+			panic(err)
+		}
 		log.Printf("Process file %s\n", filepath)
 		parser, measures := process.FindParser(reader.ReadAndDelete(pkg.FtpLocalPath+"/"+filepath), parsers)
 		if parser == nil {

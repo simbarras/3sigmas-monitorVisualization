@@ -3,6 +3,7 @@ package storer
 import (
 	"3sigmas-monitorVisualization/pkg/data"
 	"context"
+	"errors"
 	"github.com/getsentry/sentry-go"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
@@ -25,7 +26,7 @@ func NewInfluxStorer(env data.Env) *InfluxStorer {
 	org, err := client.OrganizationsAPI().FindOrganizationByName(context.Background(), env.InfluxOrg)
 	if err != nil {
 		sentry.CaptureException(err)
-		panic(err)
+		return nil
 	}
 	return &InfluxStorer{
 		client:       client,
@@ -38,6 +39,9 @@ func NewInfluxStorer(env data.Env) *InfluxStorer {
 func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.client == nil {
+		return nil
+	}
 	bucketApi := s.client.BucketsAPI()
 	bucket, err := bucketApi.FindBucketByName(context.Background(), bucketName)
 	if bucket == nil {
@@ -50,9 +54,12 @@ func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 	return bucket
 }
 
-func (s *InfluxStorer) Store(project string, source string, measures []data.Measure) {
+func (s *InfluxStorer) Store(project string, source string, measures []data.Measure) error {
 
 	bucket := s.setBucket(s.bucketPrefix + "." + project + "." + source)
+	if bucket == nil {
+		return errors.New("bucket not found")
+	}
 
 	writeAPI := s.client.WriteAPIBlocking(s.organization.Name, bucket.Name)
 
@@ -69,4 +76,5 @@ func (s *InfluxStorer) Store(project string, source string, measures []data.Meas
 		// log.Printf("Stored measure %s\n", measure)
 	}
 	log.Printf("Stored %d measures in %s\n", len(measures), bucket.Name)
+	return nil
 }

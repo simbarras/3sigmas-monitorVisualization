@@ -3,6 +3,7 @@ package listener
 import (
 	"3sigmas-monitorVisualization/pkg"
 	"3sigmas-monitorVisualization/pkg/data"
+	"errors"
 	"github.com/getsentry/sentry-go"
 	"github.com/secsy/goftp"
 	"log"
@@ -27,7 +28,7 @@ func NewFtpListener(env data.Env, maxIndex int) *FtpListener {
 	client, err := goftp.DialConfig(config, env.FtpServer)
 	if err != nil {
 		sentry.CaptureException(err)
-		panic(err)
+		return nil
 	}
 	return &FtpListener{
 		client:     client,
@@ -38,23 +39,38 @@ func NewFtpListener(env data.Env, maxIndex int) *FtpListener {
 	}
 }
 
-func (f *FtpListener) Listen() string {
+func (f *FtpListener) Listen() (string, error) {
 	log.Printf("Listening for new files... ")
-	todo, filename := f.nextFile()
+	todo, filename, err := f.nextFile()
+	if err != nil {
+		sentry.CaptureException(err)
+		return "", err
+	}
 	for !todo {
 		if !todo {
 			time.Sleep(pkg.WaitTime)
 		}
-		todo, filename = f.nextFile()
+		todo, filename, err = f.nextFile()
+		if err != nil {
+			sentry.CaptureException(err)
+			return "", err
+		}
 	}
 	log.Printf("File %s found\n", filename)
 	f.downloadFile(filename)
-	return filename
+	return filename, nil
 
 }
 
-func (f *FtpListener) nextFile() (bool, string) {
+func (f *FtpListener) nextFile() (bool, string, error) {
+	if f.client == nil {
+		return false, "", errors.New("no connection established")
+	}
 	files, err := f.client.ReadDir(f.serverPath)
+	if err != nil {
+		sentry.CaptureException(err)
+		return false, "", err
+	}
 	// Filter to keep only csv files
 	files = filter(files, func(file os.FileInfo) bool {
 		if !strings.HasSuffix(file.Name(), ".csv") {
@@ -69,13 +85,13 @@ func (f *FtpListener) nextFile() (bool, string) {
 	})
 	if err != nil {
 		sentry.CaptureException(err)
-		panic(err)
+		return false, "", err
 	}
 	if len(files) == 0 {
-		return false, ""
+		return false, "", nil
 	}
 	log.Printf("Found %d file(s)\n", len(files))
-	return true, files[0].Name()
+	return true, files[0].Name(), nil
 }
 
 func closeFile(file *os.File) {
@@ -119,8 +135,8 @@ func (f *FtpListener) RegisterBlacklist(filename string) {
 	log.Printf("File %s registered in blacklist at index %d with size %d and max size %d\n", filename, f.index, f.size, len(f.blacklist))
 }
 
-func filter(files []os.FileInfo, filter func(os.FileInfo) bool) []os.FileInfo {
-	var filtered []os.FileInfo
+func filter[K comparable](files []K, filter func(K) bool) []K {
+	var filtered []K
 	for _, file := range files {
 		if filter(file) {
 			filtered = append(filtered, file)

@@ -13,7 +13,7 @@ type Measure interface {
 	Date() time.Time
 }
 
-// Measure for senseive data -------------------------------------------------------------------------------------------
+// SenseiveMeasure Measure for senseive data ---------------------------------------------------------------------------
 type SenseiveMeasure struct {
 	DateTime    time.Time
 	Value       float64
@@ -47,7 +47,7 @@ func (m SenseiveMeasure) Date() time.Time {
 	return m.DateTime
 }
 
-// Measure for trimble data -------------------------------------------------------------------------------------------
+// TrimbleMeasure Measure for trimble data -----------------------------------------------------------------------------
 type TrimbleMeasure struct {
 	DateTime           time.Time
 	Captor             string
