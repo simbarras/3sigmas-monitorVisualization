@@ -18,7 +18,11 @@ func parseErrorTrimble(records [][]string) bool {
 
 func parseValidTrimble(records [][]string, expected []data.Measure) (bool, []data.Measure) {
 	p := TrimbleParser{}
-	m, _ := p.Parse(records)
+	m, err := p.Parse(records)
+	if err != nil {
+		log.Printf("Error: %s\n", err.Error())
+		return false, m
+	}
 	if len(m) != len(expected) {
 		return false, m
 	}
@@ -135,14 +139,14 @@ func TestTrimbleParser_Parse_valid(t *testing.T) {
 		},
 	}
 	res, resMeasure := parseValidTrimble(records, expected)
-	if res {
-		t.Errorf("Valid record should not return an error\n%v\n%v", res, resMeasure)
+	if !res {
+		t.Errorf("Valid record should not return an error\nExpected: %v\nActual: %v", expected, resMeasure)
 	}
 }
 
 func TestTrimbleParser_Parse_senseive(t *testing.T) {
 	records := [][]string{
-		{},
+		{"2023-09-06 13:32:00", "g_0_00-0_35", "Y Axis Beam Displacement", "mm", "4.203331", "24.19"},
 		{"2023-09-06 13:32:00", "g_0_00-0_35", "Y Axis Beam Displacement", "mm", "4.203331", "24.19"},
 	}
 	if parseErrorTrimble(records) {
