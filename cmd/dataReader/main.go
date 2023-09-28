@@ -25,7 +25,11 @@ func main() {
 	parsers = append(parsers, &reader.TrimbleParser{})
 
 	for {
-		filepath := ftpListener.Listen()
+		filepath, err := ftpListener.Listen()
+		if err != nil {
+			log.Printf("Error listening for new files: %s\n", err.Error())
+			panic(err)
+		}
 		log.Printf("Process file %s\n", filepath)
 		parser, measures := process.FindParser(reader.ReadAndDelete(pkg.FtpLocalPath+"/"+filepath), parsers)
 		if parser == nil {

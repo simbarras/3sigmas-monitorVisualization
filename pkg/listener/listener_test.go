@@ -1,9 +1,36 @@
 package listener
 
 import (
+	"3sigmas-monitorVisualization/pkg/data"
 	"strings"
 	"testing"
 )
+
+func TestNewFtpListener(t *testing.T) {
+	env := data.Env{
+		FtpUser:     "user",
+		FtpPassword: "password",
+		FtpServer:   "server",
+	}
+	f := NewFtpListener(env, 3)
+	if f != nil {
+		t.Errorf("No connection should be established with dummy configuration")
+	}
+}
+
+func TestFtpListener_Listen(t *testing.T) {
+	f := FtpListener{
+		client:     nil,
+		serverPath: "serverPath",
+		blacklist:  []string{"file1.csv", "file2.csv", "file3.csv"},
+		index:      0,
+		size:       3,
+	}
+	_, err := f.Listen()
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+}
 
 func TestFtpListener_RegisterBlacklist(t *testing.T) {
 	const length = 3
