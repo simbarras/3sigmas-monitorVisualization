@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"3sigmas-monitorVisualization/pkg/process"
