@@ -24,6 +24,8 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build-and-push-image:
+    needs:
+      - test
     runs-on: ubuntu-latest
     permissions:
       contents: read
