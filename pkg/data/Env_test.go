@@ -1,7 +1,6 @@
 package data
 
 import (
-	"log"
 	"os"
 	"testing"
 )
@@ -67,7 +66,17 @@ func TestEnv(t *testing.T) {
 		t.Errorf("env.FtpPassword = %s; want ftppassword", env.FtpPassword)
 	}
 
-	log.Printf("env: %s", env)
+	expected := "InfluxToken: token\n" +
+		"InfluxUrl: url\n" +
+		"InfluxOrg: org\n" +
+		"InfluxPrefix: prefix\n" +
+		"FtpServer: ftpserver\n" +
+		"FtpServerPath: ftppath\n" +
+		"FtpUser: ftpuser\n" +
+		"FtpPassword: ftppassword\n"
+	if env.String() != expected {
+		t.Errorf("env.String() = %s; want %s", env.String(), expected)
+	}
 
 	err = os.Unsetenv("INFLUX_TOKEN")
 	if err != nil {

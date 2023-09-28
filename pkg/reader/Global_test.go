@@ -74,6 +74,38 @@ func TestReadAndDelete(t *testing.T) {
 		t.Errorf("ReadAndDelete() = %d; want 1221", len(records))
 	}
 
+	records = ReadAndDelete("../../backup/" + filename)
+	if len(records) != 0 {
+		t.Errorf("ReadAndDelete() = %d; want 0", len(records))
+	}
+
+	// Check if the files are deleted
+	_, err = os.Stat("./backup/" + filename)
+	if !os.IsNotExist(err) {
+		t.Errorf("ReadAndDelete() = %s; want %s", err, "file does not exist")
+	}
+}
+
+func TestReadAndDelete_empty(t *testing.T) {
+	const filename = "Geosud-Demo_rail_2023-09-07_10-06-25-copy.csv"
+	// Copy files from ./resources to ./backup
+	err := copyFile(filename)
+	if err != nil {
+		t.Errorf("copyFile() = %s; want nil", err)
+		return
+	}
+
+	// ReadAndDelete from ./backup
+	records := ReadAndDelete("../../backup/" + filename)
+	if len(records) != 0 {
+		t.Errorf("ReadAndDelete() = %d; want 1221", len(records))
+	}
+
+	records = ReadAndDelete("../../backup/" + filename)
+	if len(records) != 0 {
+		t.Errorf("ReadAndDelete() = %d; want 0", len(records))
+	}
+
 	// Check if the files are deleted
 	_, err = os.Stat("./backup/" + filename)
 	if !os.IsNotExist(err) {

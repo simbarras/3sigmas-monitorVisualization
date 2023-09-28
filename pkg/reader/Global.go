@@ -33,7 +33,7 @@ func ReadAndDelete(filepath string) [][]string {
 	file, err := os.Open(filepath)
 	if err != nil {
 		sentry.CaptureException(err)
-		panic(err)
+		return nil
 	}
 	defer closeAndDelete(file)
 
@@ -41,7 +41,7 @@ func ReadAndDelete(filepath string) [][]string {
 	records, err := reader.ReadAll()
 	if err != nil {
 		sentry.CaptureException(err)
-		panic(err)
+		return nil
 	}
 	log.Printf("Read %d lines from %s\n", len(records), filepath)
 	return records

@@ -30,4 +30,12 @@ func TestFindParser(t *testing.T) {
 	if parser != parsers[1] {
 		t.Errorf("Expected %s, got %s", parsers[1].Source(), parser.Source())
 	}
+
+	records3 := [][]string{
+		{"asdfasdf", "g_0_00-0_35", "Y Axis Beam Displacement", "mm", "4.203331", "asdfasdf"},
+	}
+	parser, _ = FindParser(records3, parsers)
+	if parser != nil {
+		t.Errorf("Expected nil, got %s", parser.Source())
+	}
 }
