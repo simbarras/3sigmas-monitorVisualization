@@ -15,6 +15,10 @@ func (s *SenseiveParser) Parse(records [][]string) ([]data.Measure, error) {
 	measures := make([]data.Measure, 0)
 	for _, record := range records {
 
+		if len(record) != 6 {
+			return nil, errors.New("invalid record")
+		}
+
 		d, err := time.Parse("2006-01-02 15:04:05", record[0])
 		if err != nil {
 			return nil, err
