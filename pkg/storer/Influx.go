@@ -1,7 +1,6 @@
 package storer
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
 	"context"
 	"errors"
 	"github.com/getsentry/sentry-go"
@@ -9,6 +8,7 @@ import (
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 	"sync"
 )

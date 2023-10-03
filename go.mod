@@ -1,4 +1,4 @@
-module 3sigmas-monitorVisualization
+module github.com/simbarras/3sigmas-monitorVisualization
 
 go 1.21
 

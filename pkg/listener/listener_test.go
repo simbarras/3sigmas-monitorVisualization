@@ -1,7 +1,7 @@
 package listener
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"strings"
 	"testing"
 )
