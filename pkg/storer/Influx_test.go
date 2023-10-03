@@ -1,7 +1,7 @@
 package storer
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"sync"
 	"testing"
 )

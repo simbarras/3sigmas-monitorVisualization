@@ -1,11 +1,11 @@
 package listener
 
 import (
-	"3sigmas-monitorVisualization/pkg"
-	"3sigmas-monitorVisualization/pkg/data"
 	"errors"
 	"github.com/getsentry/sentry-go"
 	"github.com/secsy/goftp"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 	"os"
 	"strings"

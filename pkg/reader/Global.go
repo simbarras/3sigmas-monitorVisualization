@@ -1,9 +1,9 @@
 package reader
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
 	"encoding/csv"
 	"github.com/getsentry/sentry-go"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 	"os"
 )

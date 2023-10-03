@@ -1,8 +1,8 @@
 package reader
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
 	"errors"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 	"strconv"
 	"strings"

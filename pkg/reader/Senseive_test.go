@@ -1,7 +1,7 @@
 package reader
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
 	"log"
 	"testing"
 	"time"

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"3sigmas-monitorVisualization/pkg"
-	"3sigmas-monitorVisualization/pkg/data"
-	"3sigmas-monitorVisualization/pkg/listener"
-	"3sigmas-monitorVisualization/pkg/process"
-	"3sigmas-monitorVisualization/pkg/reader"
-	"3sigmas-monitorVisualization/pkg/storer"
 	"github.com/getsentry/sentry-go"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/listener"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/process"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/reader"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
 	"log"
 )
 
@@ -49,6 +49,12 @@ func main() {
 			continue
 		}
 		ftpListener.DeleteFile(filepath)
-		go influxStorer.Store(parser.ExtractProject(filepath), parser.Source(), measures)
+		go func() {
+			err := influxStorer.Store(parser.ExtractProject(filepath), parser.Source(), measures)
+			if err != nil {
+				log.Printf("Error storing measures: %s\n", err.Error())
+				sentry.CaptureException(err)
+			}
+		}()
 	}
 }

@@ -1,8 +1,8 @@
 package process
 
 import (
-	"3sigmas-monitorVisualization/pkg/data"
-	"3sigmas-monitorVisualization/pkg/reader"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/data"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/reader"
 	"log"
 )
 

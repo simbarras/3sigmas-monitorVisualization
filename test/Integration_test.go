@@ -1,8 +1,8 @@
 package test
 
 import (
-	"3sigmas-monitorVisualization/pkg/process"
-	"3sigmas-monitorVisualization/pkg/reader"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/process"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/reader"
 	"io"
 	"log"
 	"os"
