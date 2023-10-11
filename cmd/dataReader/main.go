@@ -8,6 +8,7 @@ import (
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/process"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/reader"
 	"github.com/simbarras/3sigmas-monitorVisualization/pkg/storer"
+	"github.com/simbarras/3sigmas-monitorVisualization/pkg/trigger"
 	"log"
 )
 
@@ -50,10 +51,16 @@ func main() {
 		}
 		ftpListener.DeleteFile(filepath)
 		go func() {
-			err := influxStorer.Store(parser.ExtractProject(filepath), parser.Source(), measures)
+			bucketName, err := influxStorer.Store(parser.ExtractProject(filepath), parser.Source(), measures)
 			if err != nil {
 				log.Printf("Error storing measures: %s\n", err.Error())
 				sentry.CaptureException(err)
+			} else {
+				err := trigger.Trigger(env.ApiTrigger, bucketName)
+				if err != nil {
+					log.Printf("Error triggering: %s\n", err.Error())
+					sentry.CaptureException(err)
+				}
 			}
 		}()
 	}

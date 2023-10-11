@@ -11,6 +11,7 @@ type Env struct {
 	FtpServerPath string
 	FtpUser       string
 	FtpPassword   string
+	ApiTrigger    string
 }
 
 func (e *Env) String() string {
@@ -34,6 +35,7 @@ func ReadEnv() Env {
 		FtpServerPath: os.Getenv("FTP_SERVER_PATH"),
 		FtpUser:       os.Getenv("FTP_USER"),
 		FtpPassword:   os.Getenv("FTP_PASSWORD"),
+		ApiTrigger:    os.Getenv("API_TRIGGER"),
 	}
 	return env
 }
