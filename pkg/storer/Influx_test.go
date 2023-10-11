@@ -22,7 +22,7 @@ func TestInfluxStorer_Store(t *testing.T) {
 		mu:           sync.Mutex{},
 		bucketPrefix: "prefix",
 	}
-	err := s.Store("project", "source", nil)
+	_, err := s.Store("project", "source", nil)
 	if err == nil {
 		t.Errorf("No store should be done with dummy configuration")
 	}
