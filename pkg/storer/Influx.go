@@ -54,11 +54,11 @@ func (s *InfluxStorer) setBucket(bucketName string) *domain.Bucket {
 	return bucket
 }
 
-func (s *InfluxStorer) Store(project string, source string, measures []data.Measure) error {
+func (s *InfluxStorer) Store(project string, source string, measures []data.Measure) (string, error) {
 
 	bucket := s.setBucket(s.bucketPrefix + "." + project + "." + source)
 	if bucket == nil {
-		return errors.New("bucket not found")
+		return "", errors.New("bucket not found")
 	}
 
 	writeAPI := s.client.WriteAPIBlocking(s.organization.Name, bucket.Name)
@@ -76,5 +76,5 @@ func (s *InfluxStorer) Store(project string, source string, measures []data.Meas
 		// log.Printf("Stored measure %s\n", measure)
 	}
 	log.Printf("Stored %d measures in %s\n", len(measures), bucket.Name)
-	return nil
+	return bucket.Name, nil
 }
